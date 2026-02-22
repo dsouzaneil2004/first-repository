@@ -1,0 +1,839 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+			<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+		<title>Monthly Overview - Smart Expense Tracker</title>
+		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+		<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+		<link rel="stylesheet" href="style.css">
+		<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+	</head>
+
+		<div class="app" role="application">
+			<header>
+				<div style="display:flex;justify-content:space-between;align-items:center">
+					<div>
+						<h1>Monthly Overview</h1>
+						<p>Dashboard & Analytics</p>
+					</div>
+					<div class="header-actions">
+						<button id="settingsToggle" class="settings-btn" type="button" aria-haspopup="menu" aria-expanded="false" aria-controls="settingsMenu">⚙ Settings</button>
+						<a href="index.html" class="nav-link">↑ Tracker</a>
+					</div>
+				</div>
+				<div id="settingsMenu" class="settings-menu" role="menu" aria-hidden="true">
+					<label class="settings-label" for="themeSelect">Theme</label>
+					<select id="themeSelect" class="settings-select" aria-label="Choose theme">
+						<option value="default">Default Blue</option>
+						<option value="dark">Dark Charcoal</option>
+						<option value="nebula">Nebula Vibrance</option>
+						<option value="cosmic">Cosmic Bloom</option>
+						<option value="crimson">Crimson Eclipse</option>
+						<option value="midnight">Midnight Purple</option>
+						<option value="emerald">Emerald Glow</option>
+						<option value="sunset">Sunset Amber</option>
+						<option value="rose">Rose Quartz</option>
+						<option value="slate">Slate Frost</option>
+					</select>
+					<div class="social-profiles">
+						<label class="settings-label">Profiles</label>
+						<div class="social-links">
+							<a href="https://www.linkedin.com/in/neil-dsouza-142078278" target="_blank" rel="noopener noreferrer" title="LinkedIn" class="social-link">LinkedIn</a>
+							<a href="https://github.com/dsouzaneil2004" target="_blank" rel="noopener noreferrer" title="GitHub" class="social-link">GitHub</a>
+						</div>
+					</div>
+					<div class="settings-actions">
+						<button id="resetThemeBtn" class="settings-action" type="button">Reset Theme</button>
+						<button id="resetAllBtn" class="settings-action" type="button">Reset Everything</button>
+						<button id="clearDataBtn" class="settings-action danger" type="button">Clear All Data</button>
+					</div>
+				</div>
+			</header>
+
+			<section class="summary" aria-label="Monthly summary">
+				<div class="card income">
+					<div class="label">Monthly Income</div>
+					<div class="value" id="monthlyIncome">₹0</div>
+				</div>
+				<div class="card expenses">
+					<div class="label">Monthly Expenses</div>
+					<div class="value" id="monthlyExpenses">₹0</div>
+				</div>
+				<div class="card balance">
+					<div class="label">Net Savings</div>
+					<div class="value" id="netSavings">₹0</div>
+				</div>
+				<div id="calendarCard" class="card calendar-card" role="button" tabindex="0" aria-label="Choose month" style="position:relative;">
+					<div class="label">Calendar</div>
+					<div class="calendar-date-row" style="display:flex;align-items:center;gap:8px;">
+						<div class="value" id="currentDateTimeDisplay" style="font-size:18px;">—</div>
+					</div>
+					<select id="monthSelector" class="month-selector" aria-label="Select month"></select>
+					<div id="activeMonthLabel" style="font-size:12px;color:rgba(200,230,255,0.75);margin-top:6px;">Select a month</div>
+				</div>
+			</section>
+
+			<main class="main-grid">
+				<section class="panel">
+					<h2 style="margin:0 0 12px 0;font-size:15px">Income vs Expenses</h2>
+					<div id="momIndicator" class="mom-indicator" aria-live="polite">
+						<div class="mom-item"><span class="mom-label">Income MoM</span><span id="momIncome" class="mom-value neutral">—</span></div>
+						<div class="mom-item"><span class="mom-label">Expense MoM</span><span id="momExpense" class="mom-value neutral">—</span></div>
+						<div class="mom-item"><span class="mom-label">Net MoM</span><span id="momNet" class="mom-value neutral">—</span></div>
+					</div>
+					<div class="chart-container" style="height:320px;">
+						<canvas id="incomeExpenseChart"></canvas>
+					</div>
+				</section>
+				<aside class="panel">
+					<h2 style="margin:0 0 12px 0;font-size:15px">Category Breakdown</h2>
+					<div class="chart-container" style="height:320px;">
+						<canvas id="categoryChart"></canvas>
+					</div>
+				</aside>
+			</main>
+
+			<main class="main-grid" style="margin-top:18px;">
+				<section class="panel">
+					<h2 style="margin:0 0 12px 0;font-size:15px">Category Breakdown</h2>
+					<div class="category-list" id="categoryBreakdown">
+						<p style="color:rgba(233,242,255,0.6);font-size:13px">No transactions yet</p>
+					</div>
+				</section>
+				   <aside class="card insights-card" style="min-height:auto;">
+					   <div class="label">Insights</div>
+					   <div class="insights-list" id="insightsList">
+						   <div class="insight-item">
+							   <div class="insight-label">Highest Category</div>
+							   <div class="insight-value" id="highestCategory">—</div>
+						   </div>
+						   <div class="insight-item">
+							   <div class="insight-label">Total Expenses</div>
+							   <div class="insight-value" id="totalTransactions">0</div>
+						   </div>
+						   <div class="insight-item">
+							   <div class="insight-label">Avg. Expense</div>
+							   <div class="insight-value" id="avgExpense">₹0</div>
+						   </div>
+					   </div>
+				   </aside>
+			</main>
+		</div>
+
+		<div id="confirmModal" class="confirm-modal" aria-hidden="true" role="dialog" aria-labelledby="confirmTitle" aria-describedby="confirmMessage">
+			<div class="confirm-card">
+				<h3 id="confirmTitle">Please Confirm</h3>
+				<p id="confirmMessage" class="confirm-message">Are you sure?</p>
+				<div class="confirm-actions">
+					<button id="confirmCancelBtn" class="settings-action" type="button">Cancel</button>
+					<button id="confirmOkBtn" class="settings-action danger" type="button">Confirm</button>
+				</div>
+			</div>
+		</div>
+
+		<script>
+			let incomeExpenseChart = null;
+			let categoryChart = null;
+			let activeMonthKey = null;
+
+			// ===== PAGE TRANSITION SYSTEM (shared with tracker page) =====
+			const PageTransitions = {
+				DURATION: 500,
+				animatedSelector: '.summary-card, .card, .dashboard-card, .chart-card, .category-item, .insight-item, .transaction-item, .panel',
+				
+				animateCardEntrance() {
+					const nodes = Array.from(document.querySelectorAll(this.animatedSelector));
+					nodes.forEach((el, i) => {
+						el.classList.add('card-enter');
+						el.style.setProperty('--i', i);
+					});
+					requestAnimationFrame(() => nodes.forEach(el => el.classList.remove('card-enter')));
+				},
+				
+				enterPage() {
+					document.body.classList.add('page-enter');
+					this.animateCardEntrance();
+					requestAnimationFrame(() => setTimeout(() => document.body.classList.remove('page-enter'), 30));
+				},
+				
+				exitPage(href) {
+					document.body.classList.add('page-exit');
+					setTimeout(() => { window.location.href = href; }, this.DURATION);
+				},
+				
+				initNavigationListeners() {
+					document.querySelectorAll('a[href$=".html"]').forEach(link => {
+						link.addEventListener('click', (e) => {
+							if(e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
+							e.preventDefault();
+							this.exitPage(link.href);
+						});
+					});
+				},
+				
+				init() {
+					this.enterPage();
+					this.initNavigationListeners();
+				}
+			};
+
+			document.addEventListener('DOMContentLoaded', () => {
+				function lockPortraitOrientation(){
+					try{
+						if(window.screen && window.screen.orientation && typeof window.screen.orientation.lock === 'function'){
+							window.screen.orientation.lock('portrait').catch(()=>{});
+						}
+					}catch(e){}
+				}
+
+				lockPortraitOrientation();
+
+				const STORAGE_KEY = 'smart_expense_transactions_v1';
+				const THEME_KEY = 'smart_expense_theme_v1';
+
+				function formatCurrencyINR(num){
+					const formatter = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' });
+					return formatter.format(num);
+				}
+
+				function applyTheme(theme){
+					const allowedThemes = ['default', 'dark', 'nebula', 'cosmic', 'crimson', 'midnight', 'emerald', 'sunset', 'rose', 'slate'];
+					const normalized = allowedThemes.includes(theme) ? theme : 'default';
+					if(normalized === 'default') document.body.removeAttribute('data-theme');
+					else document.body.setAttribute('data-theme', normalized);
+					try{ localStorage.setItem(THEME_KEY, normalized); }catch(e){}
+				}
+
+				function migrateTransactions(transactions){
+					// Add dates to transactions that don't have them (from previous code versions)
+					return transactions.map(t => {
+						if(!t.date){
+							t.date = new Date().toISOString();
+						}
+						return t;
+					});
+				}
+
+				function loadTransactions(){
+					try{
+						const raw = localStorage.getItem(STORAGE_KEY);
+						if(!raw) return [];
+						const parsed = JSON.parse(raw);
+						if(!Array.isArray(parsed)) return [];
+						
+						// Migrate old transactions to add dates
+						const migrated = migrateTransactions(parsed);
+						
+						// Save back if any migrations happened
+						if(migrated.some((t, i) => t.date !== parsed[i].date)){
+							localStorage.setItem(STORAGE_KEY, JSON.stringify(migrated));
+						}
+						
+						return migrated;
+					}catch(e){
+						return [];
+					}
+				}
+
+				function toMonthKey(dateObj){
+					const year = dateObj.getFullYear();
+					const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+					return `${year}-${month}`;
+				}
+
+				function parseMonthKey(monthKey){
+					const [yearStr, monthStr] = String(monthKey || '').split('-');
+					const year = Number(yearStr);
+					const monthIndex = Number(monthStr) - 1;
+					if(!Number.isFinite(year) || !Number.isFinite(monthIndex) || monthIndex < 0 || monthIndex > 11){
+						const now = new Date();
+						return { year: now.getFullYear(), monthIndex: now.getMonth() };
+					}
+					return { year, monthIndex };
+				}
+
+				function shiftMonthKey(monthKey, delta){
+					const { year, monthIndex } = parseMonthKey(monthKey);
+					const date = new Date(year, monthIndex, 1);
+					date.setMonth(date.getMonth() + delta);
+					return toMonthKey(date);
+				}
+
+				function getAvailableMonthKeys(transactions){
+					const now = new Date();
+					const currentKey = toMonthKey(now);
+					if(!transactions.length) return [currentKey];
+
+					let earliest = null;
+					transactions.forEach(t => {
+						const dt = new Date(t.date);
+						if(Number.isNaN(dt.getTime())) return;
+						dt.setDate(1);
+						if(!earliest || dt < earliest) earliest = dt;
+					});
+
+					if(!earliest) return [currentKey];
+
+					const start = new Date(earliest.getFullYear(), earliest.getMonth(), 1);
+					const end = new Date(now.getFullYear(), now.getMonth(), 1);
+					const months = [];
+					const cursor = new Date(start);
+					while(cursor <= end){
+						months.push(toMonthKey(cursor));
+						cursor.setMonth(cursor.getMonth() + 1);
+					}
+					return months;
+				}
+
+				function getMonthlyTransactions(transactions, monthKey){
+					const { year, monthIndex } = parseMonthKey(monthKey);
+					return transactions.filter(t => {
+						const txDate = new Date(t.date);
+						return txDate.getFullYear() === year && txDate.getMonth() === monthIndex;
+					});
+				}
+
+				function updateMonthSelector(monthKeys){
+					const selector = document.getElementById('monthSelector');
+					if(!selector) return;
+					selector.innerHTML = monthKeys.map(key => {
+						const { year, monthIndex } = parseMonthKey(key);
+						const label = new Date(year, monthIndex, 1).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+						return `<option value="${key}">${label}</option>`;
+					}).join('');
+					selector.value = activeMonthKey;
+				}
+
+				function getTotals(transactions){
+					let income = 0;
+					let expenses = 0;
+					transactions.forEach(t => {
+						if(t.type === 'income') income += t.amount;
+						else expenses += t.amount;
+					});
+					return { income, expenses, net: income - expenses };
+				}
+
+				function getChangeInfo(currentValue, previousValue){
+					const delta = currentValue - previousValue;
+					if(previousValue === 0){
+						if(currentValue === 0) return { text: '0.0%', kind: 'neutral' };
+						return { text: 'New', kind: 'positive' };
+					}
+					const pct = (delta / Math.abs(previousValue)) * 100;
+					const arrow = delta > 0 ? '↑' : (delta < 0 ? '↓' : '→');
+					const kind = delta > 0 ? 'positive' : (delta < 0 ? 'negative' : 'neutral');
+					return { text: `${arrow} ${Math.abs(pct).toFixed(1)}%`, kind };
+				}
+
+				function setMoMValue(id, change){
+					const el = document.getElementById(id);
+					if(!el) return;
+					el.textContent = change.text;
+					el.classList.remove('positive', 'negative', 'neutral');
+					el.classList.add(change.kind);
+				}
+
+				function updateMoMIndicator(currentTotals, previousTotals){
+					setMoMValue('momIncome', getChangeInfo(currentTotals.income, previousTotals.income));
+					setMoMValue('momExpense', getChangeInfo(currentTotals.expenses, previousTotals.expenses));
+					setMoMValue('momNet', getChangeInfo(currentTotals.net, previousTotals.net));
+				}
+
+				function categorizeExpense(description){
+					const desc = (description || '').toLowerCase();
+					if(desc.match(/food|eat|lunch|dinner|breakfast|restaurant|cafe|pizza|burger|coffee|snack|meal/)) return 'Food';
+					if(desc.match(/travel|car|taxi|bus|train|flight|petrol|gas|fuel|bike|auto|ride/)) return 'Travel';
+					if(desc.match(/bill|electricity|water|internet|phone|rent|mortgage|insurance/)) return 'Bills';
+					if(desc.match(/shop|buy|clothing|dress|shoes|book|gift|purchase|mall/)) return 'Shopping';
+					return 'Other';
+				}
+
+				function getCategoryBreakdown(transactions){
+					const categories = {};
+					transactions.forEach(t => {
+						if(t.type === 'expense'){
+							const cat = categorizeExpense(t.description);
+							categories[cat] = (categories[cat] || 0) + t.amount;
+						}
+					});
+					return Object.entries(categories)
+						.map(([name, amount]) => ({ name, amount }))
+						.sort((a, b) => b.amount - a.amount);
+				}
+
+				function ensureInsightsStructure(){
+					const insightsList = document.getElementById('insightsList');
+					if(!insightsList) return null;
+					if(!document.getElementById('highestCategory') || !document.getElementById('totalTransactions') || !document.getElementById('avgExpense')){
+						insightsList.innerHTML = `
+							<div class="insight-item">
+								<div class="insight-label">Highest Category</div>
+								<div class="insight-value" id="highestCategory">—</div>
+							</div>
+							<div class="insight-item">
+								<div class="insight-label">Total Expenses</div>
+								<div class="insight-value" id="totalTransactions">0</div>
+							</div>
+							<div class="insight-item">
+								<div class="insight-label">Avg. Expense</div>
+								<div class="insight-value" id="avgExpense">₹0</div>
+							</div>
+						`;
+					}
+					return insightsList;
+				}
+
+				function toggleInsightsEmptyNote(show){
+					const insightsList = ensureInsightsStructure();
+					if(!insightsList) return;
+					let note = document.getElementById('insightsEmptyNote');
+					if(show){
+						if(!note){
+							note = document.createElement('div');
+							note.id = 'insightsEmptyNote';
+							note.style.cssText = 'color:rgba(233,242,255,0.6);font-size:13px;text-align:center;padding:12px 0';
+							note.textContent = 'No insights available. Add transactions to see insights.';
+							insightsList.appendChild(note);
+						}
+					}else if(note){
+						note.remove();
+					}
+				}
+
+				function renderDashboard(){
+					ensureInsightsStructure();
+					const allTransactions = loadTransactions();
+					const availableMonthKeys = getAvailableMonthKeys(allTransactions);
+					const currentMonthKey = toMonthKey(new Date());
+					if(!activeMonthKey || !availableMonthKeys.includes(activeMonthKey)){
+						activeMonthKey = availableMonthKeys.includes(currentMonthKey) ? currentMonthKey : availableMonthKeys[availableMonthKeys.length - 1];
+					}
+					updateMonthSelector(availableMonthKeys);
+					const previousMonthKey = shiftMonthKey(activeMonthKey, -1);
+					const transactions = getMonthlyTransactions(allTransactions, activeMonthKey);
+					const prevMonthTransactions = getMonthlyTransactions(allTransactions, previousMonthKey);
+					const totals = getTotals(transactions);
+					const prevTotals = getTotals(prevMonthTransactions);
+					updateCalendarDisplay(activeMonthKey);
+					updateMoMIndicator(totals, prevTotals);
+					if(transactions.length === 0){
+						document.getElementById('monthlyIncome').textContent = '₹0';
+						document.getElementById('monthlyExpenses').textContent = '₹0';
+						document.getElementById('netSavings').textContent = '₹0';
+						document.getElementById('categoryBreakdown').innerHTML = '<p style="color:rgba(233,242,255,0.6);font-size:13px">No transactions this month</p>';
+						document.getElementById('highestCategory').textContent = '—';
+						document.getElementById('totalTransactions').textContent = '0';
+						document.getElementById('avgExpense').textContent = '₹0';
+						toggleInsightsEmptyNote(true);
+						renderIncomeExpenseChart(totals.income, totals.expenses);
+						renderCategoryChart([]);
+						return;
+					}
+					toggleInsightsEmptyNote(false);
+
+					const totalIncome = totals.income;
+					const totalExpenses = totals.expenses;
+					const netSavings = totals.net;
+
+					// Update summary cards
+					document.getElementById('monthlyIncome').textContent = formatCurrencyINR(totalIncome);
+					document.getElementById('monthlyExpenses').textContent = formatCurrencyINR(totalExpenses);
+					document.getElementById('netSavings').textContent = formatCurrencyINR(netSavings);
+
+					// Category breakdown
+					const categories = getCategoryBreakdown(transactions);
+					const categoryHTML = categories.length > 0
+						? categories.map(cat => `
+							<div class="category-item">
+								<span class="category-name">${cat.name}</span>
+								<span class="category-amount">${formatCurrencyINR(cat.amount)}</span>
+							</div>
+						`).join('')
+						: '<p style="color:rgba(233,242,255,0.6);font-size:13px">No expenses recorded</p>';
+					document.getElementById('categoryBreakdown').innerHTML = categoryHTML;
+
+					// Update insights card values
+					// Highest Category
+					if (categories.length > 0) {
+						document.getElementById('highestCategory').textContent = categories[0].name + ' (' + formatCurrencyINR(categories[0].amount) + ')';
+					} else {
+						document.getElementById('highestCategory').textContent = '—';
+					}
+					// Total Expenses
+					document.getElementById('totalTransactions').textContent = transactions.filter(t => t.type === 'expense').length;
+					// Avg. Expense
+					const expenseTransactions = transactions.filter(t => t.type === 'expense');
+					const avgExpense = expenseTransactions.length > 0 ? (expenseTransactions.reduce((sum, t) => sum + t.amount, 0) / expenseTransactions.length) : 0;
+					document.getElementById('avgExpense').textContent = formatCurrencyINR(avgExpense);
+
+					// Trigger staggered animation for newly inserted category items
+					PageTransitions.animateCardEntrance();
+					// Render charts
+					renderIncomeExpenseChart(totalIncome, totalExpenses);
+					renderCategoryChart(categories);
+			}
+
+			function renderIncomeExpenseChart(income, expenses){
+				const ctx = document.getElementById('incomeExpenseChart');
+				if(!ctx) return;
+				if(incomeExpenseChart) incomeExpenseChart.destroy();
+				const totalFlow = income + expenses;
+				const net = income - expenses;
+				const currency = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 });
+				const compact = new Intl.NumberFormat('en-IN', { notation: 'compact', maximumFractionDigits: 1 });
+
+				const valueLabelsPlugin = {
+					id: 'valueLabelsPlugin',
+					afterDraw(chart){
+						const { ctx: chartCtx } = chart;
+						const meta = chart.getDatasetMeta(0);
+						if(!meta || !meta.data) return;
+						chartCtx.save();
+						chartCtx.font = '600 11px Inter, Poppins, system-ui';
+						chartCtx.fillStyle = 'rgba(233,242,255,0.92)';
+						meta.data.forEach((bar, i) => {
+							const value = chart.data.datasets[0].data[i] || 0;
+							const share = totalFlow > 0 ? ((value / totalFlow) * 100).toFixed(1) : '0.0';
+							const label = `${currency.format(value)} • ${share}%`;
+							chartCtx.textAlign = 'left';
+							chartCtx.textBaseline = 'middle';
+							chartCtx.fillText(label, bar.x + 10, bar.y - 1);
+						});
+						const trend = net >= 0 ? 'Surplus' : 'Deficit';
+						chartCtx.textAlign = 'left';
+						chartCtx.textBaseline = 'top';
+						chartCtx.fillStyle = 'rgba(200,230,255,0.74)';
+						chartCtx.fillText(`Total flow: ${currency.format(totalFlow)}`, chart.chartArea.left, chart.chartArea.top - 22);
+						chartCtx.fillStyle = net >= 0 ? 'rgba(176,240,160,0.95)' : 'rgba(255,184,192,0.95)';
+						chartCtx.fillText(`${trend}: ${currency.format(Math.abs(net))}`, chart.chartArea.left + 180, chart.chartArea.top - 22);
+						chartCtx.restore();
+					}
+				};
+
+				incomeExpenseChart = new Chart(ctx, {
+					type: 'bar',
+					plugins: [valueLabelsPlugin],
+					data: {
+						labels: ['Income', 'Expenses'],
+						datasets: [{
+							label: 'Amount',
+							data: [income, expenses],
+							backgroundColor: ['rgba(126, 242, 166, 0.45)', 'rgba(255, 122, 134, 0.45)'],
+							borderColor: ['#7ef2a6', '#ff7a86'],
+							borderWidth: 2,
+							borderRadius: 12,
+							barThickness: 26,
+							hoverBackgroundColor: ['rgba(126, 242, 166, 0.62)', 'rgba(255, 122, 134, 0.62)']
+						}]
+					},
+					options: {
+						indexAxis: 'y',
+						responsive: true,
+						maintainAspectRatio: false,
+						layout: { padding: { right: 84, top: 28 } },
+						plugins: {
+							legend: { display: false },
+							tooltip: {
+								backgroundColor: 'rgba(2,6,23,0.88)',
+								borderColor: 'rgba(255,255,255,0.12)',
+								borderWidth: 1,
+								displayColors: false,
+								callbacks: {
+									title(items){
+										return items[0]?.label || '';
+									},
+									label(context){
+										const value = Number(context.raw) || 0;
+										const share = totalFlow > 0 ? ((value / totalFlow) * 100).toFixed(1) : '0.0';
+										return `Amount: ${currency.format(value)} (${share}% of flow)`;
+									},
+									afterBody(){
+										const trend = net >= 0 ? 'Surplus' : 'Deficit';
+										return [`${trend}: ${currency.format(Math.abs(net))}`];
+									}
+								}
+							}
+						},
+						scales: {
+							x: {
+								beginAtZero: true,
+								ticks: {
+									color: 'rgba(233,242,255,0.7)',
+									callback(value){ return compact.format(Number(value)); }
+								},
+								grid: { color: 'rgba(255,255,255,0.05)' }
+							},
+							y: { ticks: { color: 'rgba(233,242,255,0.9)' }, grid: { display: false } }
+						}
+					}
+				});
+			}
+
+			function renderCategoryChart(categories){
+				const ctx = document.getElementById('categoryChart');
+				if(!ctx) return;
+				if(categoryChart) categoryChart.destroy();
+				if(categories.length === 0) return;
+
+				const colors = ['#4fb3ff', '#7ef2a6', '#ff7a86', '#66f0c2', '#ffd700', '#ff69b4'];
+				const total = categories.reduce((sum, c) => sum + c.amount, 0);
+				const top = categories[0];
+				const currency = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 });
+
+				const centerTextPlugin = {
+					id: 'centerTextPlugin',
+					afterDraw(chart){
+						const meta = chart.getDatasetMeta(0);
+						if(!meta || !meta.data || !meta.data[0]) return;
+						const { ctx: chartCtx } = chart;
+						const x = meta.data[0].x;
+						const y = meta.data[0].y;
+						const outerRadius = meta.data[0].outerRadius;
+						const innerRadius = meta.data[0].innerRadius;
+						chartCtx.save();
+
+						meta.data.forEach((arc, index) => {
+							const value = Number(chart.data.datasets[0].data[index]) || 0;
+							const share = total > 0 ? (value / total) * 100 : 0;
+							if(share < 5) return;
+							const midAngle = (arc.startAngle + arc.endAngle) / 2;
+							const labelRadius = innerRadius + ((outerRadius - innerRadius) * 0.52);
+							const labelX = x + Math.cos(midAngle) * labelRadius;
+							const labelY = y + Math.sin(midAngle) * labelRadius;
+							chartCtx.textAlign = 'center';
+							chartCtx.textBaseline = 'middle';
+							chartCtx.fillStyle = 'rgba(233,242,255,0.95)';
+							chartCtx.font = '700 10px Inter, Poppins, system-ui';
+							chartCtx.fillText(`${share.toFixed(0)}%`, labelX, labelY);
+						});
+
+						chartCtx.textAlign = 'center';
+						chartCtx.fillStyle = 'rgba(200,230,255,0.75)';
+						chartCtx.font = '600 11px Inter, Poppins, system-ui';
+						chartCtx.fillText('Top Category', x, y - 12);
+						chartCtx.fillStyle = 'rgba(233,242,255,0.95)';
+						chartCtx.font = '700 13px Inter, Poppins, system-ui';
+						chartCtx.fillText(top.name, x, y + 4);
+						chartCtx.fillStyle = 'rgba(200,230,255,0.7)';
+						chartCtx.font = '600 11px Inter, Poppins, system-ui';
+						chartCtx.fillText(currency.format(top.amount), x, y + 20);
+
+						chartCtx.textAlign = 'left';
+						chartCtx.textBaseline = 'top';
+						chartCtx.fillStyle = 'rgba(200,230,255,0.78)';
+						chartCtx.font = '600 10px Inter, Poppins, system-ui';
+						chartCtx.fillText(`Total: ${currency.format(total)}`, chart.chartArea.left, chart.chartArea.top - 20);
+						chartCtx.fillText(`Categories: ${categories.length}`, chart.chartArea.left + 140, chart.chartArea.top - 20);
+						chartCtx.restore();
+					}
+				};
+
+				categoryChart = new Chart(ctx, {
+					type: 'doughnut',
+					plugins: [centerTextPlugin],
+					data: {
+						labels: categories.map(c => c.name),
+						datasets: [{
+							data: categories.map(c => c.amount),
+							backgroundColor: colors.map(c => c + '40').slice(0, categories.length),
+							borderColor: colors.slice(0, categories.length),
+							borderWidth: 2,
+							hoverOffset: 10
+						}]
+					},
+					options: {
+						responsive: true,
+						maintainAspectRatio: false,
+						layout: { padding: { top: 24 } },
+						cutout: '62%',
+						plugins: {
+							legend: {
+								position: 'bottom',
+								labels: {
+									color: 'rgba(233,242,255,0.9)',
+									padding: 12,
+									usePointStyle: true,
+									pointStyle: 'circle'
+								}
+							},
+							tooltip: {
+								backgroundColor: 'rgba(2,6,23,0.88)',
+								borderColor: 'rgba(255,255,255,0.12)',
+								borderWidth: 1,
+								callbacks: {
+									label(context){
+										const value = Number(context.raw) || 0;
+										const share = total > 0 ? ((value / total) * 100).toFixed(1) : '0.0';
+										return `${context.label}: ${currency.format(value)} (${share}%)`;
+									},
+									afterBody(){
+										return [`Total expenses: ${currency.format(total)}`];
+									}
+								}
+							}
+						}
+					}
+				});
+			}
+
+			function updateCalendarDisplay(monthKey) {
+				const { year, monthIndex } = parseMonthKey(monthKey);
+				const dateString = new Date(year, monthIndex, 1).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+				document.getElementById('currentDateTimeDisplay').textContent = dateString;
+				const labelEl = document.getElementById('activeMonthLabel');
+				if(labelEl){
+					labelEl.textContent = 'Transactions for selected month';
+				}
+				const card = document.getElementById('calendarCard');
+				if(card){
+					card.setAttribute('aria-pressed', 'true');
+				}
+			}
+
+			function initCalendarCardButton(){
+				const card = document.getElementById('calendarCard');
+				const selector = document.getElementById('monthSelector');
+				if(!card || !selector) return;
+				const openSelector = () => {
+					selector.focus();
+					if(typeof selector.showPicker === 'function'){
+						try{ selector.showPicker(); }catch(e){}
+					}
+				};
+				card.addEventListener('click', (e) => {
+					if(e.target === selector) return;
+					openSelector();
+				});
+				card.addEventListener('keydown', (e) => {
+					if(e.key === 'Enter' || e.key === ' '){
+						e.preventDefault();
+						openSelector();
+					}
+				});
+				selector.addEventListener('change', () => {
+					activeMonthKey = selector.value;
+					renderDashboard();
+				});
+			}
+
+			function initSettingsMenu(){
+				const toggleBtn = document.getElementById('settingsToggle');
+				const menu = document.getElementById('settingsMenu');
+				const themeSelect = document.getElementById('themeSelect');
+				const resetThemeBtn = document.getElementById('resetThemeBtn');
+				const resetAllBtn = document.getElementById('resetAllBtn');
+				const clearDataBtn = document.getElementById('clearDataBtn');
+				if(!toggleBtn || !menu || !themeSelect || !resetThemeBtn || !resetAllBtn || !clearDataBtn) return;
+
+				const storedTheme = localStorage.getItem(THEME_KEY) || 'default';
+				themeSelect.value = storedTheme;
+				applyTheme(storedTheme);
+
+				const closeMenu = () => {
+					menu.classList.remove('open');
+					document.body.classList.remove('settings-open');
+					menu.setAttribute('aria-hidden', 'true');
+					toggleBtn.setAttribute('aria-expanded', 'false');
+				};
+
+				const openMenu = () => {
+					menu.classList.add('open');
+					document.body.classList.add('settings-open');
+					menu.setAttribute('aria-hidden', 'false');
+					toggleBtn.setAttribute('aria-expanded', 'true');
+				};
+
+				toggleBtn.addEventListener('click', () => {
+					if(menu.classList.contains('open')) closeMenu();
+					else openMenu();
+				});
+
+				document.addEventListener('click', (e) => {
+					if(!menu.contains(e.target) && !toggleBtn.contains(e.target)) closeMenu();
+				});
+
+				document.addEventListener('keydown', (e) => {
+					if(e.key === 'Escape') closeMenu();
+				});
+
+				themeSelect.addEventListener('change', () => applyTheme(themeSelect.value));
+
+				resetThemeBtn.addEventListener('click', () => {
+					themeSelect.value = 'default';
+					applyTheme('default');
+					closeMenu();
+				});
+
+				function showConfirmPopup(message, confirmText = 'Confirm'){
+					const modal = document.getElementById('confirmModal');
+					const messageEl = document.getElementById('confirmMessage');
+					const cancelBtn = document.getElementById('confirmCancelBtn');
+					const okBtn = document.getElementById('confirmOkBtn');
+					if(!modal || !messageEl || !cancelBtn || !okBtn) return Promise.resolve(false);
+					messageEl.textContent = message;
+					okBtn.textContent = confirmText;
+					modal.setAttribute('aria-hidden', 'false');
+					return new Promise(resolve => {
+						const cleanup = () => {
+							modal.setAttribute('aria-hidden', 'true');
+							okBtn.removeEventListener('click', onOk);
+							cancelBtn.removeEventListener('click', onCancel);
+							modal.removeEventListener('click', onBackdrop);
+							document.removeEventListener('keydown', onKeydown);
+						};
+						const onOk = () => { cleanup(); resolve(true); };
+						const onCancel = () => { cleanup(); resolve(false); };
+						const onBackdrop = (e) => { if(e.target === modal) onCancel(); };
+						const onKeydown = (e) => { if(e.key === 'Escape') onCancel(); };
+						okBtn.addEventListener('click', onOk);
+						cancelBtn.addEventListener('click', onCancel);
+						modal.addEventListener('click', onBackdrop);
+						document.addEventListener('keydown', onKeydown);
+					});
+				}
+
+				resetAllBtn.addEventListener('click', async () => {
+					const confirmed = await showConfirmPopup('Reset everything? This will clear all transactions and restore default settings.', 'Reset');
+					if(!confirmed) return;
+					try{
+						localStorage.removeItem(STORAGE_KEY);
+						localStorage.removeItem(THEME_KEY);
+						localStorage.removeItem('smart_expense_tutorial_seen_v1');
+					}catch(e){}
+					applyTheme('default');
+					renderDashboard();
+					closeMenu();
+					window.location.reload();
+				});
+
+				clearDataBtn.addEventListener('click', async () => {
+					const confirmed = await showConfirmPopup('Clear all transactions from this app? This cannot be undone.', 'Clear Data');
+					if(!confirmed) return;
+					try{ localStorage.removeItem(STORAGE_KEY); }catch(e){}
+					renderDashboard();
+					closeMenu();
+				});
+			}
+
+			// Initialize smooth page transitions and render dashboard
+			PageTransitions.init();
+			initCalendarCardButton();
+			initSettingsMenu();
+			renderDashboard();
+			// Re-render when storage changes (from main tracker)
+			window.addEventListener('storage', renderDashboard);
+
+			// Small helper: fade scrollbars in while user scrolls (keeps CSS-only rules triggered)
+			(function(){
+				let t = null;
+				const show = () => { document.body.classList.add('show-scrollbar'); if(t) clearTimeout(t); t = setTimeout(()=>document.body.classList.remove('show-scrollbar'), 900); };
+				window.addEventListener('scroll', show, { passive: true });
+				Array.from(document.querySelectorAll('.dashboard-content, .charts-grid, .category-list')).forEach(el => el.addEventListener('scroll', show, { passive: true }));
+			})();
+
+			});
+		</script>
+	</body>
+</html>

@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+		<title>Smart Expense Tracker</title>
+		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+		<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+		<link rel="stylesheet" href="style.css">
+	</head>
+	<body>
+		<div class="app" role="application">
+			<header>
+				<div style="display:flex;justify-content:space-between;align-items:center">
+					<div>
+						<h1>Smart Expense Tracker</h1>
+						<p>Simple, modern finance overview — glassmorphism UI</p>
+						<div id="currentDateTime" style="font-size:13px;color:rgba(200,230,255,0.7);margin-top:4px"></div>
+					</div>
+					<div class="header-actions">
+						<button id="settingsToggle" class="settings-btn" type="button" aria-haspopup="menu" aria-expanded="false" aria-controls="settingsMenu">⚙ Settings</button>
+						<a href="dashboard.html" class="nav-link">Dashboard</a>
+					</div>
+				</div>
+				<div id="settingsMenu" class="settings-menu" role="menu" aria-hidden="true">
+					<label class="settings-label" for="themeSelect">Theme</label>
+					<select id="themeSelect" class="settings-select" aria-label="Choose theme">
+						<option value="default">Default Blue</option>
+						<option value="dark">Dark Charcoal</option>
+						<option value="nebula">Nebula Vibrance</option>
+						<option value="cosmic">Cosmic Bloom</option>
+						<option value="crimson">Crimson Eclipse</option>
+						<option value="midnight">Midnight Purple</option>
+						<option value="emerald">Emerald Glow</option>
+						<option value="sunset">Sunset Amber</option>
+						<option value="rose">Rose Quartz</option>
+						<option value="slate">Slate Frost</option>
+					</select>
+					<div class="social-profiles">
+						<label class="settings-label">Profiles</label>
+						<div class="social-links">
+							<a href="https://www.linkedin.com/in/neil-dsouza-142078278" target="_blank" rel="noopener noreferrer" title="LinkedIn" class="social-link">LinkedIn</a>
+							<a href="https://github.com/dsouzaneil2004" target="_blank" rel="noopener noreferrer" title="GitHub" class="social-link">GitHub</a>
+						</div>
+					</div>
+					<div class="settings-actions">
+						<button id="resetThemeBtn" class="settings-action" type="button">Reset Theme</button>
+						<button id="resetAllBtn" class="settings-action" type="button">Reset Everything</button>
+						<button id="clearDataBtn" class="settings-action danger" type="button">Clear All Data</button>
+					</div>
+				</div>
+			</header>
+
+			<section class="summary" aria-label="Summary cards">
+				<div class="card balance">
+					<div class="label">Balance</div>
+					<div class="value" id="balanceValue">$0.00</div>
+				</div>
+				<div class="card income">
+					<div class="label">Income</div>
+					<div class="value" id="incomeValue">$0.00</div>
+				</div>
+				<div class="card expenses">
+					<div class="label">Expenses</div>
+					<div class="value" id="expenseValue">$0.00</div>
+				</div>
+				<div class="card insights-card">
+					<div class="label">Spending Insights</div>
+					<div class="insights-content" id="insightsContent">
+						<div style="color:rgba(233,242,255,0.6);font-size:12px">Add transactions to see insights</div>
+					</div>
+				</div>
+			</section>
+
+			<main class="main-grid">
+				<section class="panel" aria-labelledby="add-trans">
+					<h2 id="add-trans" style="margin:0 0 12px 0;font-size:15px">Add Transaction</h2>
+					<form id="transactionForm">
+						<div class="field">
+							<label for="description">Description</label>
+							<input id="description" type="text" placeholder="e.g., Coffee, Salary" required>
+						</div>
+						<div class="row">
+							<div class="field amount-field">
+								<label for="amount">Amount</label>
+								<div class="amount-input-wrap">
+									<input id="amount" type="number" step="0.01" placeholder="0.00" required inputmode="decimal" min="0" />
+								</div>
+							</div>
+							<div class="field">
+								<label for="type">Type</label>
+								<div class="type-toggle" role="radiogroup" aria-label="Transaction type">
+									<button type="button" id="typeIncome" class="type-btn selected" aria-pressed="true">Income</button>
+									<button type="button" id="typeExpense" class="type-btn" aria-pressed="false">Expense</button>
+								</div>
+							</div>
+						</div>
+						<div style="display:flex;justify-content:flex-end;margin-top:6px">
+							<button class="add" type="submit">Add Transaction</button>
+						</div>
+					</form>
+				</section>
+
+				<aside class="panel" aria-labelledby="history">
+					<h2 id="history" style="margin:0 0 12px 0;font-size:15px">Transaction History</h2>
+					<div class="history">
+						<ul class="history-list" id="historyList" aria-live="polite"></ul>
+					</div>
+				</aside>
+			</main>
+		</div>
+
+		<!-- First-run tutorial modal (shown once) -->
+		<div id="welcomeModal" class="tutorial-modal" aria-hidden="true" role="dialog" aria-labelledby="tutorialTitle">
+ 		<div class="tutorial-card">
+ 			<button class="tutorial-close" aria-label="Close tutorial">✕</button>
+ 			<h3 id="tutorialTitle">Welcome to Smart Expense Tracker</h3>
+ 			<div id="tutorialContent" class="tutorial-step"></div>
+ 			<div class="tutorial-controls">
+ 				<button id="tutorialPrev" class="tutorial-btn">Prev</button>
+ 				<button id="tutorialNext" class="tutorial-btn">Next</button>
+ 			</div>
+ 		</div>
+		</div>
+
+		<div id="confirmModal" class="confirm-modal" aria-hidden="true" role="dialog" aria-labelledby="confirmTitle" aria-describedby="confirmMessage">
+			<div class="confirm-card">
+				<h3 id="confirmTitle">Please Confirm</h3>
+				<p id="confirmMessage" class="confirm-message">Are you sure?</p>
+				<div class="confirm-actions">
+					<button id="confirmCancelBtn" class="settings-action" type="button">Cancel</button>
+					<button id="confirmOkBtn" class="settings-action danger" type="button">Confirm</button>
+				</div>
+			</div>
+		</div>
+
+		<script src="script.js" defer></script>
+		<script>
+		function updateDateTime() {
+			const now = new Date();
+			const options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
+			const dateStr = now.toLocaleDateString(undefined, options);
+			document.getElementById('currentDateTime').textContent = dateStr;
+		}
+		document.addEventListener('DOMContentLoaded', updateDateTime);
+		</script>
+	</body>
+</html>
