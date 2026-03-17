@@ -4,6 +4,18 @@
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 		<title>Smart Expense Tracker</title>
+		<script>
+		(function() {
+			const THEME_KEY = 'smart_expense_theme_v1';
+			const allowedThemes = ['default', 'dark', 'nebula', 'cosmic', 'crimson', 'midnight', 'emerald', 'sunset', 'rose', 'slate'];
+			try {
+				const storedTheme = localStorage.getItem(THEME_KEY);
+				const theme = allowedThemes.includes(storedTheme) ? storedTheme : 'default';
+				if (theme === 'default') document.documentElement.removeAttribute('data-theme');
+				else document.documentElement.setAttribute('data-theme', theme);
+			} catch (e) {}
+		})();
+		</script>
 		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 		<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 		<link rel="stylesheet" href="style.css">
@@ -36,6 +48,10 @@
 						<option value="rose">Rose Quartz</option>
 						<option value="slate">Slate Frost</option>
 					</select>
+					<div class="settings-toggle">
+						<label class="settings-label" for="soundEffectsToggle">Sound Effects</label>
+						<input id="soundEffectsToggle" type="checkbox" aria-label="Enable button sound effects">
+					</div>
 					<div class="social-profiles">
 						<label class="settings-label">Profiles</label>
 						<div class="social-links">

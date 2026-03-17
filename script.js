@@ -2,6 +2,7 @@
 document.addEventListener('DOMContentLoaded', () => {
   const STORAGE_KEY = 'smart_expense_transactions_v1';
   const THEME_KEY = 'smart_expense_theme_v1';
+  const SOUND_KEY = 'smart_expense_button_sound_v1';
   const form = document.getElementById('transactionForm');
   const descEl = document.getElementById('description');
   const amountEl = document.getElementById('amount');
@@ -13,6 +14,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const balanceValue = document.getElementById('balanceValue');
   const incomeValue = document.getElementById('incomeValue');
   const expenseValue = document.getElementById('expenseValue');
+  let soundEnabled = true;
+  let audioContext = null;
 
   function lockPortraitOrientation(){
     try{
@@ -98,14 +101,26 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  function normalizeTransaction(input){
+    if(!input || typeof input !== 'object') return null;
+    const amount = Math.abs(Number(input.amount));
+    if(!Number.isFinite(amount)) return null;
+    const normalizedDate = new Date(input.date);
+    const type = input.type === 'income' ? 'income' : 'expense';
+    const description = String(input.description || '').trim().slice(0, 120) || 'Untitled';
+    return {
+      id: Number.isFinite(Number(input.id)) ? Number(input.id) : Date.now() + Math.floor(Math.random() * 1000),
+      description,
+      amount,
+      type,
+      date: Number.isNaN(normalizedDate.getTime()) ? new Date().toISOString() : normalizedDate.toISOString()
+    };
+  }
+
   function migrateTransactions(transactions){
-    // Add dates to transactions that don't have them (from previous code versions)
-    return transactions.map(t => {
-      if(!t.date){
-        t.date = new Date().toISOString();
-      }
-      return t;
-    });
+    return transactions
+      .map(normalizeTransaction)
+      .filter(Boolean);
   }
 
   function loadTransactions(){
@@ -119,7 +134,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const migrated = migrateTransactions(parsed);
       
       // Save back if any migrations happened
-      if(migrated.some((t, i) => t.date !== parsed[i].date)){
+      if(JSON.stringify(migrated) !== JSON.stringify(parsed)){
         localStorage.setItem(STORAGE_KEY, JSON.stringify(migrated));
       }
       
@@ -132,9 +147,95 @@ document.addEventListener('DOMContentLoaded', () => {
   function applyTheme(theme){
     const allowedThemes = ['default', 'dark', 'nebula', 'cosmic', 'crimson', 'midnight', 'emerald', 'sunset', 'rose', 'slate'];
     const normalized = allowedThemes.includes(theme) ? theme : 'default';
-    if(normalized === 'default') document.body.removeAttribute('data-theme');
-    else document.body.setAttribute('data-theme', normalized);
+    if(normalized === 'default'){
+      document.documentElement.removeAttribute('data-theme');
+      document.body.removeAttribute('data-theme');
+    } else {
+      document.documentElement.setAttribute('data-theme', normalized);
+      document.body.setAttribute('data-theme', normalized);
+    }
     try{ localStorage.setItem(THEME_KEY, normalized); }catch(e){}
+  }
+
+  function ensureAudioContext(){
+    try{
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+      if(!AudioContextClass) return null;
+      if(!audioContext) audioContext = new AudioContextClass();
+      if(audioContext.state === 'suspended') audioContext.resume().catch(()=>{});
+      return audioContext;
+    }catch(e){
+      return null;
+    }
+  }
+
+  function playGlassTap(){
+    if(!soundEnabled) return;
+    const ctx = ensureAudioContext();
+    if(!ctx) return;
+    const now = ctx.currentTime;
+
+    const master = ctx.createGain();
+    master.gain.setValueAtTime(0.0001, now);
+    master.gain.exponentialRampToValueAtTime(0.05, now + 0.006);
+    master.gain.exponentialRampToValueAtTime(0.0001, now + 0.095);
+    master.connect(ctx.destination);
+
+    const strike = ctx.createOscillator();
+    const strikeGain = ctx.createGain();
+    strike.type = 'triangle';
+    strike.frequency.setValueAtTime(2100, now);
+    strike.frequency.exponentialRampToValueAtTime(1250, now + 0.09);
+    strikeGain.gain.setValueAtTime(0.0001, now);
+    strikeGain.gain.exponentialRampToValueAtTime(0.32, now + 0.005);
+    strikeGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.09);
+    strike.connect(strikeGain);
+    strikeGain.connect(master);
+    strike.start(now);
+    strike.stop(now + 0.095);
+
+    const shimmer = ctx.createOscillator();
+    const shimmerGain = ctx.createGain();
+    shimmer.type = 'sine';
+    shimmer.frequency.setValueAtTime(3200, now);
+    shimmer.frequency.exponentialRampToValueAtTime(2400, now + 0.07);
+    shimmerGain.gain.setValueAtTime(0.0001, now);
+    shimmerGain.gain.exponentialRampToValueAtTime(0.16, now + 0.004);
+    shimmerGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.07);
+    shimmer.connect(shimmerGain);
+    shimmerGain.connect(master);
+    shimmer.start(now);
+    shimmer.stop(now + 0.075);
+  }
+
+  function setSoundEnabled(enabled, persist = true){
+    soundEnabled = !!enabled;
+    if(persist){
+      try{ localStorage.setItem(SOUND_KEY, soundEnabled ? 'on' : 'off'); }catch(e){}
+    }
+    const soundToggle = document.getElementById('soundEffectsToggle');
+    if(soundToggle) soundToggle.checked = soundEnabled;
+  }
+
+  function initButtonSoundEffects(){
+    const stored = localStorage.getItem(SOUND_KEY);
+    setSoundEnabled(stored !== 'off', false);
+
+    const soundToggle = document.getElementById('soundEffectsToggle');
+    if(soundToggle){
+      soundToggle.addEventListener('change', () => {
+        setSoundEnabled(soundToggle.checked);
+        if(soundToggle.checked) playGlassTap();
+      });
+    }
+
+    document.addEventListener('click', (event) => {
+      const element = event.target instanceof Element
+        ? event.target.closest('button, .nav-link, .social-link, .type-btn')
+        : null;
+      if(!element || element.hasAttribute('disabled')) return;
+      playGlassTap();
+    }, true);
   }
 
   function initSettingsMenu(){
@@ -219,10 +320,12 @@ document.addEventListener('DOMContentLoaded', () => {
       try{
         localStorage.removeItem(STORAGE_KEY);
         localStorage.removeItem(THEME_KEY);
+        localStorage.removeItem(SOUND_KEY);
         localStorage.removeItem('smart_expense_tutorial_seen_v1');
       }catch(e){}
       transactions = [];
       applyTheme('default');
+      setSoundEnabled(true, false);
       render();
       closeMenu();
       window.location.reload();
@@ -340,10 +443,11 @@ document.addEventListener('DOMContentLoaded', () => {
       const li = document.createElement('li');
       li.className = 'transaction-item';
       li.dataset.id = t.id;
+      const typeLabel = t.type === 'income' ? 'Income' : 'Expense';
       li.innerHTML = `
         <div class="transaction-left">
           <div class="desc">${escapeHtml(t.description)}</div>
-          <div class="meta">${t.type.charAt(0).toUpperCase() + t.type.slice(1)}</div>
+          <div class="meta">${typeLabel}</div>
         </div>
         <div style="display:flex;align-items:center;gap:10px">
           <div class="amount ${t.type === 'income' ? 'income':'expense'}">${formatCurrencyINR(t.amount)}</div>
@@ -470,6 +574,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // initial render
   render();
+  initButtonSoundEffects();
   initSettingsMenu();
 
   // ensure we're at the top on load so header isn't obscured by browser UI

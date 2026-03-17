@@ -172,6 +172,23 @@ header p{margin:0;color:rgba(200,230,255,0.85);font-size:13px;text-shadow:0 0 8p
 .settings-select:hover{border-color:rgba(220,240,255,0.4)}
 .settings-select:focus{outline:none;border-color:rgba(220,240,255,0.5);box-shadow:0 0 0 2px rgba(220,240,255,0.14), 0 10px 24px rgba(2,6,23,0.3), inset 0 1px 0 rgba(255,255,255,0.28)}
 .settings-select option{background:#1a2f48;color:#eef7ff}
+.settings-toggle{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin:10px 0;
+  padding:8px 10px;
+  border-radius:10px;
+  border:1px solid rgba(220,240,255,0.2);
+  background:linear-gradient(135deg, rgba(255,255,255,0.12), rgba(255,255,255,0.04));
+}
+.settings-toggle .settings-label{margin:0;font-size:12px;color:rgba(220,240,255,0.86)}
+.settings-toggle input[type="checkbox"]{
+  width:16px;
+  height:16px;
+  accent-color:var(--accent);
+  cursor:pointer;
+}
 .social-profiles{margin:10px 0}
 .social-links{display:flex;gap:6px;flex-wrap:wrap}
 .social-link{
@@ -216,6 +233,7 @@ header p{margin:0;color:rgba(200,230,255,0.85);font-size:13px;text-shadow:0 0 8p
 .settings-action:hover{border-color:rgba(120,180,255,0.44)}
 .settings-action.danger{border-color:rgba(255,122,134,0.34);color:#ffd5da}
 
+html[data-theme="midnight"] body,
 body[data-theme="midnight"]{
   background: linear-gradient(160deg, rgba(43,32,95,0.86) 0%, rgba(70,42,128,0.72) 55%, rgba(9,12,36,0.96) 100%), url('assets/hero.jpg');
   background-size: cover;
@@ -227,6 +245,7 @@ body[data-theme="midnight"] .app{border-color:rgba(191,160,255,0.22)}
 body[data-theme="midnight"] .card,
 body[data-theme="midnight"] .panel{border-color:rgba(191,160,255,0.24)}
 
+html[data-theme="emerald"] body,
 body[data-theme="emerald"]{
   background: linear-gradient(160deg, rgba(14,85,73,0.86) 0%, rgba(25,120,95,0.72) 55%, rgba(6,24,30,0.96) 100%), url('assets/hero.jpg');
   background-size: cover;
@@ -238,6 +257,7 @@ body[data-theme="emerald"] .app{border-color:rgba(126,242,166,0.24)}
 body[data-theme="emerald"] .card,
 body[data-theme="emerald"] .panel{border-color:rgba(126,242,166,0.26)}
 
+html[data-theme="sunset"] body,
 body[data-theme="sunset"]{
   background: linear-gradient(160deg, rgba(134,64,16,0.86) 0%, rgba(200,104,30,0.72) 55%, rgba(38,16,10,0.96) 100%), url('assets/hero.jpg');
   background-size: cover;
@@ -249,6 +269,7 @@ body[data-theme="sunset"] .app{border-color:rgba(255,180,100,0.24)}
 body[data-theme="sunset"] .card,
 body[data-theme="sunset"] .panel{border-color:rgba(255,180,100,0.26)}
 
+html[data-theme="rose"] body,
 body[data-theme="rose"]{
   background: linear-gradient(160deg, rgba(112,42,88,0.86) 0%, rgba(168,72,126,0.72) 55%, rgba(30,12,28,0.96) 100%), url('assets/hero.jpg');
   background-size: cover;
@@ -260,6 +281,7 @@ body[data-theme="rose"] .app{border-color:rgba(255,160,210,0.24)}
 body[data-theme="rose"] .card,
 body[data-theme="rose"] .panel{border-color:rgba(255,160,210,0.26)}
 
+html[data-theme="slate"] body,
 body[data-theme="slate"]{
   background: linear-gradient(160deg, rgba(26,44,64,0.86) 0%, rgba(52,78,108,0.72) 55%, rgba(8,16,28,0.96) 100%), url('assets/hero.jpg');
   background-size: cover;
@@ -271,6 +293,7 @@ body[data-theme="slate"] .app{border-color:rgba(170,210,255,0.24)}
 body[data-theme="slate"] .card,
 body[data-theme="slate"] .panel{border-color:rgba(170,210,255,0.26)}
 
+html[data-theme="dark"] body,
 body[data-theme="dark"]{
   background: linear-gradient(160deg, rgba(16,18,24,0.9) 0%, rgba(28,32,40,0.78) 55%, rgba(6,8,12,0.98) 100%), url('assets/hero.jpg');
   background-size: cover;
@@ -282,6 +305,7 @@ body[data-theme="dark"] .app{border-color:rgba(180,190,210,0.22)}
 body[data-theme="dark"] .card,
 body[data-theme="dark"] .panel{border-color:rgba(180,190,210,0.24)}
 
+html[data-theme="nebula"] body,
 body[data-theme="nebula"]{
   background: linear-gradient(155deg, rgba(76,32,160,0.9) 0%, rgba(162,52,186,0.78) 34%, rgba(46,112,216,0.74) 68%, rgba(12,26,58,0.96) 100%), url('assets/hero.jpg');
   background-size: cover;
@@ -293,6 +317,7 @@ body[data-theme="nebula"] .app{border-color:rgba(194,146,255,0.26)}
 body[data-theme="nebula"] .card,
 body[data-theme="nebula"] .panel{border-color:rgba(194,146,255,0.3)}
 
+html[data-theme="crimson"] body,
 body[data-theme="crimson"]{
   background: linear-gradient(160deg, rgba(18,8,10,0.94) 0%, rgba(56,10,18,0.86) 40%, rgba(120,16,34,0.72) 72%, rgba(6,4,6,0.98) 100%), url('assets/hero.jpg');
   background-size: cover;
@@ -304,6 +329,7 @@ body[data-theme="crimson"] .app{border-color:rgba(255,120,140,0.26)}
 body[data-theme="crimson"] .card,
 body[data-theme="crimson"] .panel{border-color:rgba(255,120,140,0.3)}
 
+html[data-theme="cosmic"] body,
 body[data-theme="cosmic"]{
   background: linear-gradient(155deg, rgba(22,14,44,0.92) 0%, rgba(88,26,86,0.8) 34%, rgba(154,44,92,0.72) 62%, rgba(42,14,40,0.92) 82%, rgba(8,8,18,0.98) 100%), url('assets/hero.jpg');
   background-size: cover;
